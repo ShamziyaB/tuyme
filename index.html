@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Түйме — балаларға арналған пернетақта</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0B1B3A; --bg2:#132A5C;
+    --coral:#FF6B5E; --sun:#FFC93C; --mint:#3FE0B0; --sky:#57B8FF; --pink:#FF6FB0;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0; overflow:hidden; background:var(--bg1);}
+  body{
+    font-family:'Nunito', sans-serif;
+    background:radial-gradient(ellipse at 50% 20%, var(--bg2), var(--bg1) 70%);
+    color:#EAF1FF;
+    touch-action:none;
+    -webkit-user-select:none; user-select:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stage{position:fixed; inset:0; overflow:hidden;}
+  .intro{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:24px;
+    gap:14px; transition:opacity .5s ease;
+  }
+  .intro h1{
+    font-family:'Baloo 2', sans-serif; font-weight:800;
+    font-size:clamp(28px, 6vw, 54px); margin:0;
+    color:var(--sun);
+    text-shadow:0 0 24px rgba(255,201,60,.35);
+  }
+  .intro p{
+    font-size:clamp(15px, 2.6vw, 20px); color:#B9C7EA; max-width:480px; margin:0; line-height:1.5;
+  }
+  .intro .hint{
+    margin-top:8px; font-family:'Baloo 2'; font-weight:700; font-size:clamp(16px,3vw,22px);
+    color:#EAF1FF; padding:12px 26px; border-radius:999px;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+    box-shadow:0 8px 24px rgba(255,111,94,.35);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  .footer-note{
+    position:absolute; bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    left:0; right:0; text-align:center; font-size:12px; color:#5C6B94;
+  }
+  .pop{
+    position:absolute; font-family:'Baloo 2', sans-serif; font-weight:700;
+    pointer-events:none; will-change:transform, opacity;
+    animation:popIn 900ms cubic-bezier(.2,.8,.3,1) forwards;
+    text-shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+  @keyframes popIn{
+    0%{ transform:translate(-50%,-50%) scale(.2) rotate(var(--rot)); opacity:0; }
+    18%{ transform:translate(-50%,-50%) scale(1.15) rotate(var(--rot)); opacity:1; }
+    32%{ transform:translate(-50%,-50%) scale(1) rotate(var(--rot)); opacity:1; }
+    100%{ transform:translate(-50%, calc(-50% - 40px)) scale(.9) rotate(var(--rot)); opacity:0; }
+  }
+  .counter{
+    position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px;
+    font-size:13px; color:#4A5B8C; font-family:'Nunito';
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="intro" id="intro">
+      <h1>Түйме</h1>
+      <p>Кез келген пернені бас — экранда әріп пен смайлик билейді. Ешбір ақы, тіркеу және жарнама жоқ.</p>
+      <div class="hint">Пернетақтаны түрт! ⌨️</div>
+    </div>
+    <div class="counter" id="counter"></div>
+  </div>
+
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  const intro = document.getElementById('intro');
+  const counterEl = document.getElementById('counter');
+
+  // Қазақ кириллица әліпбиі (42 әріп)
+  const ALPHABET = "АӘБВГҒДЕЁЖЗИЙКҚЛМНҢОӨПРСТУҰҮФХҺЦЧШЩЪЫІЬЭЮЯ".split('');
+  const EMOJI = ["🐱","🐶","🐻","🐸","🦊","🐵","🦁","🐨","🐼","⭐","🌈","🎈","🍎","🍓","🌸","🚀","🚗","⚽","🎵","☀️","💫","🦋","🐝","🐢"];
+  const COLORS = ["#FF6B5E","#FFC93C","#3FE0B0","#57B8FF","#FF6FB0","#9B7BFF"];
+
+  let taps = 0;
+  let audioCtx = null;
+
+  function ensureAudio(){
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  // --- Балалық дауыс (Web Speech API) ---
+  let bestVoice = null;
+  function pickVoice(){
+    const voices = speechSynthesis.getVoices();
+    if (!voices.length) return null;
+    return (
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('kk')) ||
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru') && /female|жен/i.test(v.name)) ||
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru')) ||
+      voices.find(v => /female|samantha|zira|google.*female/i.test(v.name)) ||
+      voices[0]
+    );
+  }
+  if ('speechSynthesis' in window) {
+    bestVoice = pickVoice();
+    speechSynthesis.onvoiceschanged = () => { bestVoice = pickVoice(); };
+  }
+
+  function speakLetter(char){
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(char);
+    if (bestVoice) { utter.voice = bestVoice; utter.lang = bestVoice.lang; }
+    else { utter.lang = 'ru-RU'; }
+    utter.pitch = 1.8;   // тәтті балалық дауыс үшін жоғары үн
+    utter.rate = 0.85;
+    utter.volume = 1;
+    speechSynthesis.speak(utter);
+  }
+
+  function playBlip(){
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const freq = 380 + Math.random() * 420;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.6, now + 0.12);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function spawn(x, y, forcedChar){
+    const useEmoji = !forcedChar && Math.random() < 0.35;
+    const el = document.createElement('div');
+    el.className = 'pop';
+    el.textContent = forcedChar ? forcedChar : (useEmoji ? pick(EMOJI) : pick(ALPHABET));
+    const size = 46 + Math.random() * 70;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.fontSize = size + 'px';
+    el.style.color = pick(COLORS);
+    el.style.setProperty('--rot', (Math.random() * 30 - 15) + 'deg');
+    stage.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+
+    taps++;
+    counterEl.textContent = 'Түртілді: ' + taps;
+
+    playBlip();
+
+    if (intro.style.display !== 'none') {
+      intro.style.opacity = '0';
+      setTimeout(() => { intro.style.display = 'none'; }, 500);
+    }
+  }
+
+  function randomPos(){
+    const margin = 60;
+    return {
+      x: margin + Math.random() * (window.innerWidth - margin * 2),
+      y: margin + Math.random() * (window.innerHeight - margin * 2)
+    };
+  }
+
+  window.addEventListener('keydown', (e) => {
+    ensureAudio();
+    // Жүйелік әрекеттерге кедергі болмас үшін бас пернелерді өткіземіз
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'F5' || e.key === 'F11' || e.key === 'F12' || e.key === 'Tab') return;
+    e.preventDefault();
+    const p = randomPos();
+    const isLetterOrDigit = /^[\p{L}\p{N}]$/u.test(e.key);
+    if (isLetterOrDigit) {
+      const ch = e.key.toUpperCase();
+      spawn(p.x, p.y, ch);
+      speakLetter(ch);
+    } else {
+      // бос орын, көрсеткілер, т.б. — жай ойнақы эффект (spawn() өз дыбысын ойнатады)
+      spawn(p.x, p.y);
+    }
+  });
+
+  function pointerSpawn(x, y){
+    ensureAudio();
+    spawn(x, y);
+  }
+
+  stage.addEventListener('pointerdown', (e) => {
+    pointerSpawn(e.clientX, e.clientY);
+  });
+
+  stage.addEventListener('touchstart', (e) => {
+    for (const t of e.changedTouches) {
+      pointerSpawn(t.clientX, t.clientY);
+    }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
