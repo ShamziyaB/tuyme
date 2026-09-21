@@ -119,6 +119,19 @@
     92%{ opacity:0.9; }
     100%{ transform:translateY(105vh) translateX(18px) rotate(180deg); opacity:0; }
   }
+  .unlock-btn{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:17px;
+    color:#0B1B3A; background:linear-gradient(135deg, #FFC93C, #FF8A3C);
+    border:none; border-radius:999px; padding:13px 28px; cursor:pointer;
+    box-shadow:0 8px 24px rgba(255,201,60,.45), 0 2px 0 rgba(0,0,0,.12);
+    transition:transform .15s ease, box-shadow .15s ease, opacity .3s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .unlock-btn:active{ transform:scale(0.96); }
+  .unlock-btn.hidden{ opacity:0; pointer-events:none; transform:scale(0.95); }
+  .sound-hint{
+    font-size:11px; color:#7A8BC0; margin-top:4px; max-width:300px; line-height:1.4;
+  }
   /* чтобы контент был над фоном */
   .stage > .intro{ z-index:2; }
   .pop{ z-index:4; }
@@ -228,6 +241,8 @@
     <div class="intro" id="intro">
       <h1>Түйме</h1>
       <p>Кез келген пернені бас — экранда әріп пен смайлик билейді. Ешбір ақы, тіркеу және жарнама жоқ.</p>
+      <button id="unlockBtn" class="unlock-btn" type="button">🔊 Дыбысты қосу</button>
+      <div id="soundHint" class="sound-hint">Дыбыс жоқ па? Дыбысты қосып, телефонның бүйіріндегі дыбыс қосқышын тексеріңіз</div>
       <div class="hint">Пернетақтаны түрт! ⌨️</div>
     </div>
     <div class="counter" id="counter"></div>
@@ -246,13 +261,38 @@
 
   let taps = 0;
   let audioCtx = null;
+  let audioUnlocked = false;
 
-  function ensureAudio(){
+  async function ensureAudio(){
     if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch(e) { return false; }
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx.state === 'suspended') {
+      try { await audioCtx.resume(); } catch(e) {}
+    }
+    // iOS прогрев пустым буфером - нужен один раз для разблокировки
+    if (!audioUnlocked && audioCtx.state === 'running') {
+      try {
+        const buf = audioCtx.createBuffer(1, 1, 22050);
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(audioCtx.destination);
+        src.start(0);
+        src.stop(0.01);
+        audioUnlocked = true;
+      } catch(e) {}
+    }
+    return audioCtx.state === 'running';
   }
+
+  // Разблокировка по видимости страницы (после сворачивания)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(()=>{});
+    }
+  });
 
   // --- Балалық дауыс (Web Speech API) ---
   let bestVoice = null;
@@ -284,21 +324,24 @@
     speechSynthesis.speak(utter);
   }
 
-  function playBlip(){
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    const freq = 380 + Math.random() * 420;
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.6, now + 0.12);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + 0.3);
+  async function playBlip(){
+    const ok = await ensureAudio();
+    if (!ok || !audioCtx || audioCtx.state !== 'running') return;
+    try {
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const freq = 380 + Math.random() * 420;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.6, now + 0.12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } catch(e) {}
   }
 
   function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
@@ -338,12 +381,12 @@
     };
   }
 
-  window.addEventListener('keydown', (e) => {
-    ensureAudio();
+  window.addEventListener('keydown', async (e) => {
     // Жүйелік әрекеттерге кедергі болмас үшін бас пернелерді өткіземіз
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key === 'F5' || e.key === 'F11' || e.key === 'F12' || e.key === 'Tab') return;
     e.preventDefault();
+    await ensureAudio();
     const p = randomPos();
     const isLetterOrDigit = /^[\p{L}\p{N}]$/u.test(e.key);
     if (isLetterOrDigit) {
@@ -356,20 +399,66 @@
     }
   });
 
-  function pointerSpawn(x, y){
-    ensureAudio();
+  // --- Кнопка разблокировки звука (для iOS/Chrome mobile) ---
+  (function initUnlock(){
+    const btn = document.getElementById('unlockBtn');
+    const hint = document.getElementById('soundHint');
+    if (!btn) return;
+    // если уже разблокировали ранее - скрываем
+    if (localStorage.getItem('tuyme_audio_unlocked') === '1') {
+      btn.classList.add('hidden');
+      if (hint) hint.style.display = 'none';
+      setTimeout(()=>{ btn.style.display='none'; if(hint) hint.style.display='none'; }, 350);
+    }
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await ensureAudio();
+      // прогрев speechSynthesis на мобилке
+      if ('speechSynthesis' in window) {
+        try { speechSynthesis.getVoices(); } catch(e2){}
+        try {
+          const u = new SpeechSynthesisUtterance('');
+          u.volume = 0; speechSynthesis.speak(u);
+        } catch(e2){}
+      }
+      localStorage.setItem('tuyme_audio_unlocked', '1');
+      btn.classList.add('hidden');
+      if (hint) hint.style.display = 'none';
+      setTimeout(()=>{ btn.style.display='none'; }, 350);
+      // демо-звук чтобы юзер понял что включилось
+      playBlip();
+    });
+    // также скрываем кнопку после первого успешного тапа
+    window._hideUnlockIfRunning = () => {
+      if (audioCtx && audioCtx.state === 'running') {
+        localStorage.setItem('tuyme_audio_unlocked', '1');
+        btn.classList.add('hidden');
+        if (hint) hint.style.display = 'none';
+        setTimeout(()=>{ btn.style.display='none'; if(hint) hint.style.display='none'; }, 350);
+      }
+    };
+  })();
+
+  let lastPointerTime = 0;
+  async function pointerSpawn(x, y){
+    // защита от дубля pointerdown+touchstart
+    const now = Date.now();
+    if (now - lastPointerTime < 350) return;
+    lastPointerTime = now;
+    await ensureAudio();
     spawn(x, y);
+    // Вариант А: 30% шанс озвучить случайную букву при тапе
+    if (Math.random() < 0.30) {
+      speakLetter(pick(ALPHABET));
+    }
+    if (window._hideUnlockIfRunning) window._hideUnlockIfRunning();
   }
 
   stage.addEventListener('pointerdown', (e) => {
+    // игнорируем клик по кнопке
+    if (e.target.closest && e.target.closest('#unlockBtn')) return;
     pointerSpawn(e.clientX, e.clientY);
   });
-
-  stage.addEventListener('touchstart', (e) => {
-    for (const t of e.changedTouches) {
-      pointerSpawn(t.clientX, t.clientY);
-    }
-  }, { passive: true });
 
   // падающий снег — новогодний вайб (домики с крышами в снегу)
   (function initSnow(){
