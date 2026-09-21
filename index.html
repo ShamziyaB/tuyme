@@ -55,23 +55,176 @@
   .pop{
     position:absolute; font-family:'Baloo 2', sans-serif; font-weight:700;
     pointer-events:none; will-change:transform, opacity;
-    animation:popIn 900ms cubic-bezier(.2,.8,.3,1) forwards;
+    animation:popIn 2900ms cubic-bezier(.2,.8,.3,1) forwards;
     text-shadow:0 4px 18px rgba(0,0,0,.35);
   }
   @keyframes popIn{
     0%{ transform:translate(-50%,-50%) scale(.2) rotate(var(--rot)); opacity:0; }
-    18%{ transform:translate(-50%,-50%) scale(1.15) rotate(var(--rot)); opacity:1; }
-    32%{ transform:translate(-50%,-50%) scale(1) rotate(var(--rot)); opacity:1; }
-    100%{ transform:translate(-50%, calc(-50% - 40px)) scale(.9) rotate(var(--rot)); opacity:0; }
+    7%{ transform:translate(-50%,-50%) scale(1.15) rotate(var(--rot)); opacity:1; }
+    11%{ transform:translate(-50%,-50%) scale(1) rotate(var(--rot)); opacity:1; }
+    72%{ transform:translate(-50%,-50%) scale(1) rotate(var(--rot)); opacity:1; }
+    100%{ transform:translate(-50%, calc(-50% - 26px)) scale(.94) rotate(var(--rot)); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pop{ animation-duration:3200ms; }
+    .snow-layer, .falling-snow{ display:none; }
   }
   .counter{
     position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px;
     font-size:13px; color:#4A5B8C; font-family:'Nunito';
+    z-index:3;
   }
+  /* — Новогодняя деревня — */
+  .winter-bg{
+    position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .winter-bg .sky-glow{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 8%, rgba(255,255,255,0.09) 0%, transparent 55%),
+      radial-gradient(ellipse at 18% 18%, rgba(159,183,255,0.18) 0%, transparent 42%),
+      radial-gradient(ellipse at 82% 20%, rgba(255,201,60,0.10) 0%, transparent 38%);
+  }
+  .winter-bg .village{
+    position:absolute; left:0; right:0; bottom:0; height:min(42vh, 380px);
+    display:block; width:100%;
+  }
+  .village svg{ width:100%; height:100%; display:block; }
+  .snow-layer{
+    position:absolute; inset:0; pointer-events:none; z-index:1;
+    background-image:
+      radial-gradient(2px 2px at 12% 18%, rgba(255,255,255,0.9) 50%, transparent 60%),
+      radial-gradient(1.6px 1.6px at 28% 42%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1.3px 1.3px at 44% 12%, rgba(255,255,255,0.8) 50%, transparent 60%),
+      radial-gradient(2px 2px at 62% 28%, rgba(255,255,255,0.9) 50%, transparent 60%),
+      radial-gradient(1.4px 1.4px at 76% 52%, rgba(255,255,255,0.82) 50%, transparent 60%),
+      radial-gradient(1.8px 1.8px at 88% 14%, rgba(255,255,255,0.88) 50%, transparent 60%),
+      radial-gradient(1.2px 1.2px at 35% 68%, rgba(255,255,255,0.75) 50%, transparent 60%),
+      radial-gradient(1.5px 1.5px at 52% 78%, rgba(255,255,255,0.78) 50%, transparent 60%);
+    opacity:0.9;
+    animation: snowTwinkle 4.5s ease-in-out infinite alternate;
+  }
+  @keyframes snowTwinkle{ 0%{opacity:0.7} 100%{opacity:1} }
+  .falling-snow{
+    position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden;
+  }
+  .falling-snow span{
+    position:absolute; top:-10px; color:#fff; font-size:10px; line-height:1;
+    opacity:0.85; text-shadow:0 0 6px rgba(255,255,255,0.8);
+    animation: fall linear infinite;
+  }
+  @keyframes fall{
+    0%{ transform:translateY(-10px) translateX(0) rotate(0deg); opacity:0; }
+    8%{ opacity:0.9; }
+    92%{ opacity:0.9; }
+    100%{ transform:translateY(105vh) translateX(18px) rotate(180deg); opacity:0; }
+  }
+  /* чтобы контент был над фоном */
+  .stage > .intro{ z-index:2; }
+  .pop{ z-index:4; }
 </style>
 </head>
 <body>
   <div class="stage" id="stage">
+    <!-- Зимний фон: домики с заснеженными крышами -->
+    <div class="winter-bg" aria-hidden="true">
+      <div class="sky-glow"></div>
+      <div class="village">
+        <svg viewBox="0 0 1440 360" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+          <!-- дальние горы -->
+          <path d="M0 210 L180 90 L320 160 L480 70 L620 150 L760 60 L920 140 L1080 80 L1240 160 L1440 110 L1440 360 L0 360 Z" fill="#0E2040" opacity="0.95"/>
+          <path d="M0 220 L160 110 L300 170 L460 95 L610 165 L740 85 L900 155 L1060 100 L1220 170 L1440 130 L1440 360 L0 360 Z" fill="#162E5A" opacity="0.9"/>
+          <!-- снежные шапки гор -->
+          <path d="M180 90 L210 125 L175 135 L145 125 Z M480 70 L515 115 L470 130 L435 110 Z M760 60 L795 110 L750 125 L710 105 Z M1080 80 L1115 125 L1070 135 L1035 118 Z" fill="white" opacity="0.92"/>
+          <!-- земля / снег -->
+          <rect x="0" y="300" width="1440" height="60" fill="#EAF2FF"/>
+          <ellipse cx="720" cy="302" rx="780" ry="28" fill="white" opacity="0.95"/>
+          <!-- домик 1 -->
+          <g>
+            <rect x="78" y="192" width="170" height="112" rx="3" fill="#F0D9B5" stroke="#C9A86A" stroke-width="3"/>
+            <rect x="98" y="214" width="36" height="36" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="108" y="214" width="16" height="2" fill="#FFD36A" opacity="0.9"/><rect x="108" y="228" width="16" height="2" fill="#FFD36A" opacity="0.9"/>
+            <rect x="98" y="230" width="36" height="2" fill="#FFD36A" opacity="0.9"/><rect x="115" y="214" width="2" height="36" fill="#FFD36A" opacity="0.9"/>
+            <rect x="142" y="214" width="36" height="36" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="154" y="240" width="12" height="10" fill="#FFC93C" opacity="0.95"/>
+            <rect x="190" y="214" width="36" height="36" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="104" y="262" width="46" height="42" rx="2" fill="#3B2A1A" stroke="#6B4A2A" stroke-width="2"/>
+            <circle cx="118" cy="283" r="3" fill="#FFD36A"/>
+            <polygon points="68,192 163,92 258,192" fill="white" stroke="#D8ECFF" stroke-width="3" stroke-linejoin="round"/>
+            <polygon points="68,192 163,92 258,192" fill="white" opacity="0.98"/>
+            <!-- снег на крыше -->
+            <path d="M92 138 Q163 170 232 140 Q210 150 163 162 Q116 150 92 138 Z" fill="#EAF6FF" opacity="0.9"/>
+            <!-- труба -->
+            <rect x="198" y="118" width="18" height="46" rx="2" fill="#B88A5A" stroke="#8A6640" stroke-width="1.5"/>
+            <rect x="196" y="114" width="22" height="8" rx="2" fill="#8A6640"/>
+            <!-- дым -->
+            <circle cx="207" cy="100" r="7" fill="white" opacity="0.55"/><circle cx="215" cy="84" r="5" fill="white" opacity="0.38"/><circle cx="221" cy="70" r="3.5" fill="white" opacity="0.28"/>
+          </g>
+          <!-- домик 2 (центр) -->
+          <g>
+            <rect x="420" y="176" width="210" height="128" rx="3" fill="#F7E6C8" stroke="#C9A86A" stroke-width="3"/>
+            <rect x="445" y="202" width="40" height="44" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="465" y="202" width="2" height="44" fill="#FFD36A"/><rect x="445" y="223" width="40" height="2" fill="#FFD36A"/>
+            <rect x="495" y="202" width="40" height="44" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="545" y="202" width="40" height="44" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="555" y="230" width="20" height="16" fill="#FFC93C" opacity="0.92"/>
+            <rect x="465" y="262" width="54" height="42" rx="2" fill="#3B2A1A" stroke="#6B4A2A" stroke-width="2"/>
+            <circle cx="482" cy="283" r="3.2" fill="#FFD36A"/>
+            <rect x="545" y="268" width="42" height="36" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2"/>
+            <rect x="555" y="276" width="22" height="20" fill="#FFE8A0" opacity="0.85"/>
+            <polygon points="410,176 525,78 640,176" fill="white" stroke="#D8ECFF" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M435 132 Q525 166 612 134 Q580 148 525 160 Q470 148 435 132 Z" fill="#EAF6FF" opacity="0.9"/>
+            <rect x="568" y="102" width="20" height="52" rx="2" fill="#B88A5A" stroke="#8A6640" stroke-width="1.5"/>
+            <rect x="566" y="98" width="24" height="8" rx="2" fill="#8A6640"/>
+            <circle cx="578" cy="84" r="7.5" fill="white" opacity="0.52"/><circle cx="586" cy="68" r="5.2" fill="white" opacity="0.36"/><circle cx="592" cy="54" r="3.6" fill="white" opacity="0.26"/>
+          </g>
+          <!-- домик 3 -->
+          <g>
+            <rect x="820" y="200" width="150" height="104" rx="3" fill="#EADFC6" stroke="#C9A86A" stroke-width="3"/>
+            <rect x="840" y="220" width="34" height="34" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="882" y="220" width="34" height="34" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="924" y="220" width="34" height="34" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="850" y="268" width="44" height="36" rx="2" fill="#3B2A1A" stroke="#6B4A2A" stroke-width="2"/>
+            <circle cx="864" cy="286" r="3" fill="#FFD36A"/>
+            <polygon points="812,200 895,114 978,200" fill="white" stroke="#D8ECFF" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M834 152 Q895 178 958 154 Q932 166 895 174 Q858 166 834 152 Z" fill="#EAF6FF" opacity="0.9"/>
+            <rect x="928" y="134" width="16" height="42" rx="2" fill="#B88A5A" stroke="#8A6640" stroke-width="1.3"/>
+          </g>
+          <!-- домик 4 -->
+          <g>
+            <rect x="1120" y="188" width="190" height="116" rx="3" fill="#F0D9B5" stroke="#C9A86A" stroke-width="3"/>
+            <rect x="1142" y="212" width="38" height="38" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="1190" y="212" width="38" height="38" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="1238" y="212" width="38" height="38" rx="2" fill="#1A2F56" stroke="#FFD36A" stroke-width="2.5"/>
+            <rect x="1194" y="264" width="50" height="40" rx="2" fill="#3B2A1A" stroke="#6B4A2A" stroke-width="2"/>
+            <circle cx="1209" cy="284" r="3" fill="#FFD36A"/>
+            <polygon points="1110,188 1215,88 1320,188" fill="white" stroke="#D8ECFF" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M1134 134 Q1215 166 1296 136 Q1268 150 1215 162 Q1162 150 1134 134 Z" fill="#EAF6FF" opacity="0.9"/>
+            <rect x="1248" y="112" width="18" height="48" rx="2" fill="#B88A5A" stroke="#8A6640" stroke-width="1.5"/>
+          </g>
+          <!-- елки -->
+          <g fill="#0B3D2E" opacity="0.95">
+            <polygon points="360,300 380,240 340,240 360,200 325,200 345,160 310,160 335,120 375,120 400,160 365,160 385,200 350,200 370,240 330,240 350,300" />
+            <polygon points="720,300 740,250 700,250 720,215 690,215 710,180 675,180 700,145 740,145 765,180 730,180 750,215 720,215 740,250 700,250 720,300" />
+            <polygon points="1020,300 1040,250 1000,250 1020,215 990,215 1010,180 975,180 1000,145 1040,145 1065,180 1030,180 1050,215 1020,215 1040,250 1000,250 1020,300" />
+          </g>
+          <g fill="white" opacity="0.92">
+            <polygon points="335,120 355,130 335,140 315,130 Z" />
+            <polygon points="700,145 720,155 700,165 680,155 Z" />
+            <polygon points="1000,145 1020,155 1000,165 980,155 Z" />
+          </g>
+          <!-- фонари -->
+          <g>
+            <rect x="360" y="252" width="4" height="48" fill="#2B2B2B"/><circle cx="362" cy="248" r="9" fill="#FFD36A" stroke="#FFAA3B" stroke-width="1.2" opacity="0.95"/><circle cx="362" cy="248" r="14" fill="#FFC93C" opacity="0.18"/>
+            <rect x="980" y="252" width="4" height="48" fill="#2B2B2B"/><circle cx="982" cy="248" r="9" fill="#FFD36A" stroke="#FFAA3B" stroke-width="1.2" opacity="0.95"/><circle cx="982" cy="248" r="14" fill="#FFC93C" opacity="0.18"/>
+          </g>
+          <!-- луна -->
+          <circle cx="1220" cy="62" r="26" fill="#FFF7C2" opacity="0.95"/><circle cx="1230" cy="56" r="7" fill="#FFE9A0" opacity="0.45"/><circle cx="1212" cy="70" r="4" fill="#FFE9A0" opacity="0.35"/>
+        </svg>
+      </div>
+      <div class="snow-layer"></div>
+      <div class="falling-snow" id="fallingSnow" aria-hidden="true"></div>
+    </div>
     <div class="intro" id="intro">
       <h1>Түйме</h1>
       <p>Кез келген пернені бас — экранда әріп пен смайлик билейді. Ешбір ақы, тіркеу және жарнама жоқ.</p>
@@ -88,7 +241,7 @@
 
   // Қазақ кириллица әліпбиі (42 әріп)
   const ALPHABET = "АӘБВГҒДЕЁЖЗИЙКҚЛМНҢОӨПРСТУҰҮФХҺЦЧШЩЪЫІЬЭЮЯ".split('');
-  const EMOJI = ["🐱","🐶","🐻","🐸","🦊","🐵","🦁","🐨","🐼","⭐","🌈","🎈","🍎","🍓","🌸","🚀","🚗","⚽","🎵","☀️","💫","🦋","🐝","🐢"];
+  const EMOJI = ["🐱","🐶","🐻","🐸","🦊","🐵","🦁","🐨","🐼","⭐","🌈","🎈","🍎","🍓","🌸","🚀","🚗","⚽","🎵","☀️","💫","🦋","🐝","🐢","⛄","❄️","☃️","🎄","🎅","🤶","🎁","🎀","🧣","🧤","✨","🌟","🎉","🎊","🍪","🍬","🍭","🦌","🐧","🏠","🌨️","❤️","💖","🔔","🕯️","🌲","⛸️","🥳","🧸","🍊","🥨","🎂","🧁","🦄","🐰","🦝","🐹","🐳","🦋","🌙","☃️"];
   const COLORS = ["#FF6B5E","#FFC93C","#3FE0B0","#57B8FF","#FF6FB0","#9B7BFF"];
 
   let taps = 0;
@@ -163,6 +316,8 @@
     el.style.setProperty('--rot', (Math.random() * 30 - 15) + 'deg');
     stage.appendChild(el);
     el.addEventListener('animationend', () => el.remove());
+    // страховка если вкладка в фоне — анимация может не закончиться
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 3200);
 
     taps++;
     counterEl.textContent = 'Түртілді: ' + taps;
@@ -215,6 +370,25 @@
       pointerSpawn(t.clientX, t.clientY);
     }
   }, { passive: true });
+
+  // падающий снег — новогодний вайб (домики с крышами в снегу)
+  (function initSnow(){
+    const snowRoot = document.getElementById('fallingSnow');
+    if(!snowRoot) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const flakes = ['❄','❅','❆','•'];
+    const count = 22;
+    for(let i=0;i<count;i++){
+      const s = document.createElement('span');
+      s.textContent = flakes[Math.floor(Math.random()*flakes.length)];
+      s.style.left = (Math.random()*100) + '%';
+      s.style.animationDuration = (6 + Math.random()*7) + 's';
+      s.style.animationDelay = (Math.random()*8) + 's';
+      s.style.fontSize = (8 + Math.random()*11) + 'px';
+      s.style.opacity = (0.55 + Math.random()*0.45);
+      snowRoot.appendChild(s);
+    }
+  })();
 })();
 </script>
 </body>
