@@ -263,17 +263,18 @@
   let audioCtx = null;
   let audioUnlocked = false;
 
-  async function ensureAudio(){
+  function ensureAudio(){
     if (!audioCtx) {
       try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       } catch(e) { return false; }
     }
     if (audioCtx.state === 'suspended') {
-      try { await audioCtx.resume(); } catch(e) {}
+      // синхронный вызов - важно для iOS: должен быть в стеке жеста без await
+      audioCtx.resume().catch(()=>{});
     }
-    // iOS прогрев пустым буфером - нужен один раз для разблокировки
-    if (!audioUnlocked && audioCtx.state === 'running') {
+    // iOS прогрев пустым буфером - один раз
+    if (!audioUnlocked) {
       try {
         const buf = audioCtx.createBuffer(1, 1, 22050);
         const src = audioCtx.createBufferSource();
@@ -284,7 +285,7 @@
         audioUnlocked = true;
       } catch(e) {}
     }
-    return audioCtx.state === 'running';
+    return true;
   }
 
   // Разблокировка по видимости страницы (после сворачивания)
@@ -324,9 +325,9 @@
     speechSynthesis.speak(utter);
   }
 
-  async function playBlip(){
-    const ok = await ensureAudio();
-    if (!ok || !audioCtx || audioCtx.state !== 'running') return;
+  function playBlip(){
+    const ok = ensureAudio();
+    if (!ok || !audioCtx) return;
     try {
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
@@ -341,6 +342,8 @@
       osc.connect(gain).connect(audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.3);
+      // если контекст еще suspended (iOS задержка), повторный resume
+      if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
     } catch(e) {}
   }
 
@@ -381,12 +384,12 @@
     };
   }
 
-  window.addEventListener('keydown', async (e) => {
+  window.addEventListener('keydown', (e) => {
     // Жүйелік әрекеттерге кедергі болмас үшін бас пернелерді өткіземіз
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key === 'F5' || e.key === 'F11' || e.key === 'F12' || e.key === 'Tab') return;
     e.preventDefault();
-    await ensureAudio();
+    ensureAudio();
     const p = randomPos();
     const isLetterOrDigit = /^[\p{L}\p{N}]$/u.test(e.key);
     if (isLetterOrDigit) {
@@ -410,9 +413,9 @@
       if (hint) hint.style.display = 'none';
       setTimeout(()=>{ btn.style.display='none'; if(hint) hint.style.display='none'; }, 350);
     }
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      await ensureAudio();
+      ensureAudio();
       // прогрев speechSynthesis на мобилке
       if ('speechSynthesis' in window) {
         try { speechSynthesis.getVoices(); } catch(e2){}
@@ -425,12 +428,12 @@
       btn.classList.add('hidden');
       if (hint) hint.style.display = 'none';
       setTimeout(()=>{ btn.style.display='none'; }, 350);
-      // демо-звук чтобы юзер понял что включилось
+      // демо-звук чтобы юзер понял что включилось - синхронно в жесте
       playBlip();
     });
     // также скрываем кнопку после первого успешного тапа
     window._hideUnlockIfRunning = () => {
-      if (audioCtx && audioCtx.state === 'running') {
+      if (audioCtx) {
         localStorage.setItem('tuyme_audio_unlocked', '1');
         btn.classList.add('hidden');
         if (hint) hint.style.display = 'none';
@@ -440,21 +443,31 @@
   })();
 
   let lastPointerTime = 0;
-  async function pointerSpawn(x, y){
-    // защита от дубля pointerdown+touchstart
+  function pointerSpawn(x, y){
+    // защита от дубля pointerdown+touchstart/click
     const now = Date.now();
     if (now - lastPointerTime < 350) return;
     lastPointerTime = now;
-    await ensureAudio();
+    // синхронно - важно для мобилки: без await чтобы остаться в стеке жеста
+    ensureAudio();
     spawn(x, y);
     if (window._hideUnlockIfRunning) window._hideUnlockIfRunning();
   }
 
-  stage.addEventListener('pointerdown', (e) => {
-    // игнорируем клик по кнопке
+  function handlePointer(e){
     if (e.target.closest && e.target.closest('#unlockBtn')) return;
-    pointerSpawn(e.clientX, e.clientY);
-  });
+    const x = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? (e.changedTouches && e.changedTouches[0]?.clientX);
+    const y = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? (e.changedTouches && e.changedTouches[0]?.clientY);
+    if (x==null || y==null) return;
+    pointerSpawn(x, y);
+  }
+  stage.addEventListener('pointerdown', handlePointer);
+  stage.addEventListener('touchend', (e) => {
+    // iOS часто требует touchend для разблокировки
+    if (e.cancelable) e.preventDefault();
+    handlePointer(e);
+  }, {passive:false});
+  stage.addEventListener('click', handlePointer);
 
   // падающий снег — новогодний вайб (домики с крышами в снегу)
   (function initSnow(){
