@@ -447,10 +447,6 @@
     lastPointerTime = now;
     await ensureAudio();
     spawn(x, y);
-    // Вариант А: 30% шанс озвучить случайную букву при тапе
-    if (Math.random() < 0.30) {
-      speakLetter(pick(ALPHABET));
-    }
     if (window._hideUnlockIfRunning) window._hideUnlockIfRunning();
   }
 
