@@ -204,6 +204,35 @@
   const EMOJI = ["🐱","🐶","🐻","🐸","🦊","🐵","🦁","🐨","🐼","⭐","🌈","🎈","🍎","🍓","🌸","🚀","🚗","⚽","🎵","☀️","💫","🦋","🐝","🐢","⛄","❄️","☃️","🎄","🎅","🤶","🎁","🎀","🧣","🧤","✨","🌟","🎉","🎊","🍪","🍬","🍭","🦌","🐧","🏠","🌨️","❤️","💖","🔔","🕯️","🌲","⛸️","🥳","🧸","🍊","🥨","🎂","🧁","🦄","🐰","🦝","🐹","🐳","🦋","🌙","☃️"];
   const COLORS = ["#FF6B5E","#FFC93C","#3FE0B0","#57B8FF","#FF6FB0","#9B7BFF"];
 
+  // === Аудио-файлы букв из abc-kaz-sounds ===
+  // Легко расширяется: просто докинь файл в папку abc-kaz-sounds и добавь строку сюда
+  const LETTER_SOUNDS = {
+    "А": "abc-kaz-sounds/ABC-A.m4a",
+    "A": "abc-kaz-sounds/ABC-A.m4a",
+    "Б": "abc-kaz-sounds/ABC-Б.m4a",
+    "В": "abc-kaz-sounds/ABC-В.m4a",
+    "Г": "abc-kaz-sounds/ABC-Г.m4a",
+    "Д": "abc-kaz-sounds/ABC-D.m4a",
+    "D": "abc-kaz-sounds/ABC-D.m4a",
+    "Е": "abc-kaz-sounds/ABC-Е.m4a",
+    "E": "abc-kaz-sounds/ABC-Е.m4a"
+  };
+  const audioCache = {};
+  function preloadLetterSounds(){
+    Object.entries(LETTER_SOUNDS).forEach(([k, url])=>{
+      if (audioCache[k]) return;
+      try{
+        const a = new Audio();
+        a.src = encodeURI(url);
+        a.preload = 'auto';
+        a.load();
+        audioCache[k] = a;
+      }catch(e){}
+    });
+  }
+  // предзагрузка сразу (не блокирует рендер)
+  preloadLetterSounds();
+
   // режим АБВ / Смайлы
   let mode = localStorage.getItem('tuyme_mode') || 'letters';
 
@@ -284,16 +313,41 @@
     speechSynthesis.onvoiceschanged = () => { bestVoice = pickVoice(); };
   }
 
-  function speakLetter(char){
+  function speakLetterFallback(char){
     if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
+    try{ speechSynthesis.cancel(); }catch(e){}
     const utter = new SpeechSynthesisUtterance(char);
     if (bestVoice) { utter.voice = bestVoice; utter.lang = bestVoice.lang; }
     else { utter.lang = 'ru-RU'; }
     utter.pitch = 1.8;   // тәтті балалық дауыс үшін жоғары үн
     utter.rate = 0.85;
     utter.volume = 1;
-    speechSynthesis.speak(utter);
+    try{ speechSynthesis.speak(utter); }catch(e){}
+  }
+
+  function speakLetter(char){
+    const up = (char || '').toString().toUpperCase();
+    const url = LETTER_SOUNDS[up] || LETTER_SOUNDS[char];
+    if (url) {
+      // приоритет — реальный аудио-файл из abc-kaz-sounds
+      let a = audioCache[up] || audioCache[char];
+      if (!a) {
+        try{
+          a = new Audio(encodeURI(url));
+          a.preload = 'auto';
+          audioCache[up] = a;
+        }catch(e){ return speakLetterFallback(char); }
+      }
+      try{
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && p.catch) p.catch(()=> speakLetterFallback(char));
+        return;
+      }catch(e){
+        return speakLetterFallback(char);
+      }
+    }
+    speakLetterFallback(char);
   }
 
   function playBlip(){
@@ -343,7 +397,8 @@
     taps++;
     counterEl.textContent = 'Түртілді: ' + taps;
 
-    playBlip();
+    // для букв — озвучка файлом (speakLetter), blip только для рандомных тапов/эмодзи
+    if (!forcedChar) playBlip();
 
     if (intro.style.display !== 'none') {
       intro.style.opacity = '0';
@@ -391,6 +446,7 @@
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       ensureAudio();
+      preloadLetterSounds();
       // прогрев speechSynthesis на мобилке
       if ('speechSynthesis' in window) {
         try { speechSynthesis.getVoices(); } catch(e2){}
@@ -399,6 +455,15 @@
           u.volume = 0; speechSynthesis.speak(u);
         } catch(e2){}
       }
+      // прогрев аудио-файлов (важно для iOS — play в стеке жеста)
+      Object.values(audioCache).forEach(a=>{
+        try{
+          const p=a.play();
+          if(p && p.then){
+            p.then(()=>{a.pause(); a.currentTime=0;}).catch(()=>{});
+          }
+        }catch(e2){}
+      });
       localStorage.setItem('tuyme_audio_unlocked', '1');
       btn.classList.add('hidden');
       if (hint) hint.style.display = 'none';
