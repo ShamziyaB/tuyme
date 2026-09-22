@@ -86,11 +86,15 @@
       radial-gradient(ellipse at 82% 20%, rgba(255,201,60,0.10) 0%, transparent 38%);
   }
   .winter-bg .village{
-    position:absolute; left:0; right:0; bottom:0; height:min(58vh, 560px);
-    display:block; width:100%;
+    position:absolute; inset:0;
+    display:block; width:100%; height:100%;
   }
   .village picture{ display:block; width:100%; height:100%; }
   .village img{ width:100%; height:100%; display:block; object-fit:cover; object-position:center bottom; }
+  /* на очень узком телефоне держим домики внизу, звезды сверху */
+  @media (max-width: 600px){
+    .village img{ object-position:center 85%; }
+  }
   .village svg{ width:100%; height:100%; display:block; }
   .snow-layer{
     position:absolute; inset:0; pointer-events:none; z-index:1;
@@ -146,8 +150,9 @@
       <div class="sky-glow"></div>
             <div class="village">
         <picture>
-          <source srcset="assets/village-bg.webp" type="image/webp">
-          <img src="assets/village-bg.jpg" alt="Зимняя деревня" width="1280" height="720" loading="eager" decoding="async" fetchpriority="high">
+          <source srcset="assets/village-bg-960.webp 960w, assets/village-bg.webp 1920w" type="image/webp" sizes="100vw">
+          <source srcset="assets/village-bg-960.jpg 960w, assets/village-bg.jpg 1920w" type="image/jpeg" sizes="100vw">
+          <img src="assets/village-bg.jpg" alt="Зимняя деревня" width="1920" height="1079" loading="eager" decoding="async" fetchpriority="high">
         </picture>
       </div>
       <div class="snow-layer"></div>
