@@ -86,9 +86,11 @@
       radial-gradient(ellipse at 82% 20%, rgba(255,201,60,0.10) 0%, transparent 38%);
   }
   .winter-bg .village{
-    position:absolute; left:0; right:0; bottom:0; height:min(52vh, 520px);
+    position:absolute; left:0; right:0; bottom:0; height:min(58vh, 560px);
     display:block; width:100%;
   }
+  .village picture{ display:block; width:100%; height:100%; }
+  .village img{ width:100%; height:100%; display:block; object-fit:cover; object-position:center bottom; }
   .village svg{ width:100%; height:100%; display:block; }
   .snow-layer{
     position:absolute; inset:0; pointer-events:none; z-index:1;
@@ -142,216 +144,11 @@
     <!-- Зимний фон: домики с заснеженными крышами -->
     <div class="winter-bg" aria-hidden="true">
       <div class="sky-glow"></div>
-      <div class="village">
-        <svg viewBox="0 0 1920 560" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-          <!-- ночное небо -->
-          <rect width="1920" height="560" fill="#0B1B3A"/>
-          <rect width="1920" height="400" fill="url(#skyGrad)"/>
-          <defs>
-            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#162A5C"/><stop offset="100%" stop-color="#0B1B3A"/>
-            </linearGradient>
-            <radialGradient id="winGlow" cx="50%" cy="50%"><stop offset="0%" stop-color="#FFF2B8" stop-opacity="0.95"/><stop offset="100%" stop-color="#FFC93C" stop-opacity="0.85"/></radialGradient>
-          </defs>
-          <!-- звезды как на картине -->
-          <g fill="#FFD54F" opacity="1">
-            <text x="48" y="62" font-size="28">★</text><text x="175" y="132" font-size="32">★</text><text x="302" y="68" font-size="18">★</text><text x="408" y="198" font-size="22">★</text><text x="508" y="82" font-size="16">★</text><text x="612" y="128" font-size="26">★</text><text x="718" y="58" font-size="30">★</text><text x="845" y="182" font-size="20">★</text><text x="945" y="78" font-size="24">★</text><text x="1060" y="168" font-size="18">★</text><text x="1185" y="62" font-size="28">★</text><text x="1312" y="128" font-size="22">★</text><text x="1428" y="68" font-size="16">★</text><text x="1535" y="148" font-size="26">★</text><text x="1662" y="78" font-size="30">★</text><text x="1790" y="132" font-size="20">★</text><text x="1880" y="58" font-size="18">★</text>
-            <circle cx="22" cy="122" r="2.2"/><circle cx="98" cy="202" r="1.8"/><circle cx="268" cy="168" r="2"/><circle cx="488" cy="228" r="1.6"/><circle cx="588" cy="268" r="1.8"/><circle cx="782" cy="238" r="1.5"/><circle cx="968" cy="258" r="1.7"/><circle cx="1098" cy="208" r="2"/><circle cx="1248" cy="248" r="1.6"/><circle cx="1412" cy="208" r="1.8"/><circle cx="1558" cy="228" r="2"/><circle cx="1712" cy="198" r="1.7"/><circle cx="1852" cy="168" r="1.5"/>
-          </g>
-          <!-- дальние елки силуэты -->
-          <g fill="#0A2F3A" opacity="0.85">
-            <polygon points="320,500 355,380 285,380 330,300 270,300 310,220 360,220 395,300 340,300 380,380 310,380 345,500"/>
-            <polygon points="640,500 675,390 605,390 645,320 590,320 625,240 675,240 710,320 660,320 695,390 625,390 660,500"/>
-            <polygon points="1040,500 1075,380 1005,380 1050,300 990,300 1030,220 1080,220 1115,300 1060,300 1100,380 1030,380 1065,500"/>
-            <polygon points="1420,500 1455,390 1385,390 1425,320 1370,320 1405,240 1455,240 1490,320 1440,320 1475,390 1405,390 1440,500"/>
-          </g>
-          <!-- снег земля -->
-          <rect x="0" y="510" width="1920" height="50" fill="#EAF2FF"/>
-          <ellipse cx="960" cy="515" rx="980" ry="30" fill="white" opacity="0.97"/>
-          <!-- ДОМИК 1 (левый край, как на картине) -->
-          <g>
-            <rect x="18" y="288" width="268" height="222" rx="4" fill="#8B5A2E" stroke="#5A341E" stroke-width="4"/>
-            <rect x="18" y="288" width="268" height="222" rx="4" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
-            <!-- окна 1 ряд -->
-            <rect x="48" y="328" width="62" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="58" y="338" width="42" height="48" rx="1" fill="url(#winGlow)" opacity="0.95"/>
-            <rect x="128" y="328" width="62" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="138" y="338" width="42" height="48" rx="1" fill="url(#winGlow)" opacity="0.95"/>
-            <rect x="198" y="328" width="62" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="208" y="338" width="42" height="48" rx="1" fill="url(#winGlow)" opacity="0.95"/>
-            <!-- окна 2 ряд -->
-            <rect x="48" y="412" width="62" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="58" y="422" width="42" height="42" rx="1" fill="url(#winGlow)" opacity="0.95"/>
-            <rect x="198" y="412" width="62" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="208" y="422" width="42" height="42" rx="1" fill="url(#winGlow)" opacity="0.95"/>
-            <!-- дверь -->
-            <rect x="118" y="412" width="72" height="78" rx="2" fill="#3B2314" stroke="#5A341E" stroke-width="2.5"/>
-            <rect x="128" y="424" width="52" height="58" rx="1" fill="#5A341E"/>
-            <rect x="144" y="442" width="10" height="14" rx="1" fill="#FFD56B"/>
-            <!-- венок на стене как на картине -->
-            <circle cx="152" cy="368" r="22" fill="none" stroke="#1B7A3A" stroke-width="8"/>
-            <circle cx="152" cy="368" r="22" fill="none" stroke="#2FA14A" stroke-width="3" opacity="0.6"/>
-            <g fill="#E53935"><circle cx="152" cy="348" r="5"/><circle cx="138" cy="360" r="4"/><circle cx="166" cy="360" r="4"/><circle cx="152" cy="382" r="5"/></g>
-            <g fill="#E53935"><rect x="142" y="368" width="20" height="10" rx="2"/><polygon points="142,368 132,360 142,360"/><polygon points="162,368 172,360 162,360"/></g>
-            <!-- гирлянда -->
-            <path d="M28 318 Q72 348 118 332 Q152 318 198 335 Q232 348 276 322" fill="none" stroke="#1B7A3A" stroke-width="7" stroke-linecap="round"/>
-            <g fill="#FF3B30"><circle cx="42" cy="324" r="5"/><circle cx="92" cy="344" r="5"/><circle cx="142" cy="330" r="5"/><circle cx="192" cy="334" r="5"/><circle cx="242" cy="334" r="5"/></g>
-            <g fill="#FFD54F"><circle cx="68" cy="338" r="4"/><circle cx="118" cy="340" r="4"/><circle cx="168" cy="332" r="4"/><circle cx="218" cy="340" r="4"/></g>
-            <!-- крыша снег -->
-            <polygon points="6,288 152,148 298,288" fill="white" stroke="#D6E8FF" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M32 232 Q152 286 268 232 Q220 256 152 268 Q84 256 32 232 Z" fill="#E6F2FF" opacity="0.95"/>
-            <!-- гирлянда на крыше -->
-            <path d="M22 284 Q60 302 100 284 Q148 264 192 284 Q232 304 280 282" fill="none" stroke="#FFD54F" stroke-width="2.5" stroke-dasharray="6 6" opacity="0.9"/>
-            <g fill="#FFD54F"><circle cx="42" cy="290" r="3"/><circle cx="88" cy="294" r="3"/><circle cx="132" cy="278" r="3"/><circle cx="178" cy="286" r="3"/><circle cx="224" cy="290" r="3"/><circle cx="262" cy="284" r="3"/></g>
-            <!-- труба -->
-            <rect x="212" y="168" width="28" height="72" rx="2" fill="#A06A33" stroke="#7A4A2E" stroke-width="2"/>
-            <rect x="208" y="160" width="36" height="12" rx="2" fill="#7A4A2E"/>
-            <circle cx="226" cy="142" r="8" fill="white" opacity="0.55"/><circle cx="238" cy="118" r="5.5" fill="white" opacity="0.38"/><circle cx="244" cy="98" r="3.5" fill="white" opacity="0.28"/>
-          </g>
-          <!-- ЕЛКА 1 между 1-2 -->
-          <g>
-            <polygon points="335,510 370,420 300,420 350,350 290,350 330,280 370,280 405,350 350,350 385,420 315,420 350,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-            <polygon points="350,280 360,260 350,240 340,260 350,280" fill="#FFD54F" stroke="#FFA000" stroke-width="1.5"/>
-            <g fill="#FF3B30"><circle cx="335" cy="360" r="5"/><circle cx="365" cy="390" r="4"/><circle cx="345" cy="430" r="5"/><circle cx="355" cy="320" r="4"/></g>
-            <g fill="#FFD54F"><circle cx="350" cy="380" r="3"/><circle cx="330" cy="410" r="3"/><circle cx="360" cy="450" r="3"/></g>
-            <rect x="342" y="510" width="16" height="12" fill="#5A341E"/>
-          </g>
-          <!-- ДОМИК 2 -->
-          <g>
-            <rect x="405" y="308" width="300" height="202" rx="4" fill="#8B5A2E" stroke="#5A341E" stroke-width="4"/>
-            <rect x="435" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="445" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="518" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="528" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="601" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="611" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="435" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="445" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="518" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="528" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="601" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="611" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="495" y="442" width="70" height="68" rx="2" fill="#3B2314" stroke="#5A341E" stroke-width="2.5"/>
-            <circle cx="512" cy="476" r="3" fill="#FFD56B"/>
-            <!-- гирлянда -->
-            <path d="M412 338 Q462 358 512 342 Q562 326 612 344 Q658 360 698 332" fill="none" stroke="#1B7A3A" stroke-width="7" stroke-linecap="round"/>
-            <g fill="#FFD54F"><circle cx="432" cy="344" r="4"/><circle cx="482" cy="352" r="5"/><circle cx="532" cy="340" r="4"/><circle cx="582" cy="348" r="5"/><circle cx="632" cy="344" r="4"/></g>
-            <g fill="#E53935"><rect x="502" y="338" width="18" height="10" rx="2"/><polygon points="502,338 492,330 502,330"/><polygon points="520,338 530,330 520,330" fill="#E53935"/></g>
-            <polygon points="392,308 555,168 718,308" fill="white" stroke="#D6E8FF" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M418 246 Q555 298 690 246 Q630 270 555 282 Q480 270 418 246 Z" fill="#E6F2FF" opacity="0.95"/>
-            <path d="M408 304 Q455 320 500 304 Q555 284 600 304 Q648 322 690 302" fill="none" stroke="#FFD54F" stroke-width="2.5" stroke-dasharray="6 6" opacity="0.9"/>
-            <rect x="598" y="188" width="28" height="72" rx="2" fill="#A06A33" stroke="#7A4A2E" stroke-width="2"/>
-            <rect x="594" y="180" width="36" height="12" rx="2" fill="#7A4A2E"/>
-            <circle cx="612" cy="162" r="7" fill="white" opacity="0.5"/><circle cx="622" cy="138" r="5" fill="white" opacity="0.35"/>
-          </g>
-          <!-- ЕЛКА 2 (центральная большая как на картине) -->
-          <g>
-            <polygon points="742,510 782,420 702,420 752,350 692,350 732,280 772,280 812,350 752,350 787,420 717,420 757,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-            <polygon points="757,280 767,260 757,240 747,260 757,280" fill="#FFD54F" stroke="#FFA000" stroke-width="1.5"/>
-            <g fill="#FF3B30"><circle cx="732" cy="360" r="5"/><circle cx="772" cy="390" r="4"/><circle cx="742" cy="430" r="5"/><circle cx="762" cy="320" r="4"/></g>
-            <rect x="749" y="510" width="16" height="12" fill="#5A341E"/>
-          </g>
-          <!-- ДОМИК 3 (центральный) -->
-          <g>
-            <rect x="785" y="298" width="320" height="212" rx="4" fill="#8B5A2E" stroke="#5A341E" stroke-width="4"/>
-            <rect x="815" y="332" width="66" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="825" y="342" width="46" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="900" y="332" width="66" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="910" y="342" width="46" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="985" y="332" width="66" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="995" y="342" width="46" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="815" y="418" width="66" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="825" y="428" width="46" height="44" rx="1" fill="url(#winGlow)"/>
-            <rect x="900" y="418" width="66" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="910" y="428" width="46" height="44" rx="1" fill="url(#winGlow)"/>
-            <rect x="985" y="418" width="66" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="995" y="428" width="46" height="44" rx="1" fill="url(#winGlow)"/>
-            <rect x="882" y="434" width="72" height="76" rx="2" fill="#3B2314" stroke="#5A341E" stroke-width="2.5"/>
-            <circle cx="898" cy="470" r="3" fill="#FFD56B"/>
-            <!-- два венка как на картине -->
-            <circle cx="945" cy="372" r="20" fill="none" stroke="#1B7A3A" stroke-width="7"/>
-            <g fill="#E53935"><rect x="937" y="368" width="16" height="8" rx="2"/><polygon points="937,368 928,362 937,362"/><polygon points="953,368 962,362 953,362"/></g>
-            <circle cx="945" cy="452" r="22" fill="none" stroke="#1B7A3A" stroke-width="7"/>
-            <g fill="#E53935"><rect x="935" y="448" width="20" height="10" rx="2"/><polygon points="935,448 925,440 935,440"/><polygon points="955,448 965,440 955,440"/></g>
-            <path d="M792 328 Q845 348 895 332 Q945 316 995 334 Q1042 350 1098 322" fill="none" stroke="#1B7A3A" stroke-width="7" stroke-linecap="round"/>
-            <g fill="#FFD54F"><circle cx="812" cy="334" r="4"/><circle cx="862" cy="342" r="5"/><circle cx="912" cy="330" r="4"/><circle cx="962" cy="340" r="5"/><circle cx="1012" cy="334" r="4"/></g>
-            <polygon points="772,298 945,158 1118,298" fill="white" stroke="#D6E8FF" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M798 232 Q945 286 1090 232 Q1030 258 945 272 Q860 258 798 232 Z" fill="#E6F2FF" opacity="0.95"/>
-            <rect x="978" y="178" width="28" height="72" rx="2" fill="#A06A33" stroke="#7A4A2E" stroke-width="2"/>
-            <rect x="974" y="170" width="36" height="12" rx="2" fill="#7A4A2E"/>
-            <circle cx="992" cy="152" r="7" fill="white" opacity="0.5"/><circle cx="1002" cy="128" r="5" fill="white" opacity="0.35"/>
-          </g>
-          <!-- ЕЛКА 3 -->
-          <g>
-            <polygon points="1145,510 1180,420 1110,420 1155,350 1095,350 1135,280 1175,280 1215,350 1155,350 1190,420 1120,420 1155,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-            <polygon points="1155,280 1165,260 1155,240 1145,260 1155,280" fill="#FFD54F" stroke="#FFA000" stroke-width="1.5"/>
-            <rect x="1147" y="510" width="16" height="12" fill="#5A341E"/>
-          </g>
-          <!-- ДОМИК 4 -->
-          <g>
-            <rect x="1190" y="308" width="300" height="202" rx="4" fill="#8B5A2E" stroke="#5A341E" stroke-width="4"/>
-            <rect x="1220" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1230" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="1303" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1313" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="1386" y="342" width="64" height="68" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1396" y="352" width="44" height="48" rx="1" fill="url(#winGlow)"/>
-            <rect x="1220" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1230" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="1303" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1313" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="1386" y="426" width="64" height="62" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1396" y="436" width="44" height="42" rx="1" fill="url(#winGlow)"/>
-            <rect x="1280" y="442" width="70" height="68" rx="2" fill="#3B2314" stroke="#5A341E" stroke-width="2.5"/>
-            <circle cx="1296" cy="476" r="3" fill="#FFD56B"/>
-            <path d="M1197 338 Q1247 358 1297 342 Q1347 326 1397 344 Q1443 360 1483 332" fill="none" stroke="#1B7A3A" stroke-width="7" stroke-linecap="round"/>
-            <g fill="#FFD54F"><circle cx="1217" cy="344" r="4"/><circle cx="1267" cy="352" r="5"/><circle cx="1317" cy="340" r="4"/><circle cx="1367" cy="348" r="5"/><circle cx="1417" cy="344" r="4"/></g>
-            <g fill="#E53935"><rect x="1287" y="338" width="18" height="10" rx="2"/><polygon points="1287,338 1277,330 1287,330"/><polygon points="1305,338 1315,330 1305,330"/></g>
-            <polygon points="1177,308 1340,168 1503,308" fill="white" stroke="#D6E8FF" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M1203 246 Q1340 298 1475 246 Q1415 270 1340 282 Q1265 270 1203 246 Z" fill="#E6F2FF" opacity="0.95"/>
-            <rect x="1383" y="188" width="28" height="72" rx="2" fill="#A06A33" stroke="#7A4A2E" stroke-width="2"/>
-            <rect x="1379" y="180" width="36" height="12" rx="2" fill="#7A4A2E"/>
-          </g>
-          <!-- ЕЛКА 4 -->
-          <g>
-            <polygon points="1528,510 1563,420 1493,420 1538,350 1478,350 1518,280 1558,280 1598,350 1538,350 1573,420 1503,420 1538,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-            <polygon points="1538,280 1548,260 1538,240 1528,260 1538,280" fill="#FFD54F" stroke="#FFA000" stroke-width="1.5"/>
-            <g fill="#FF3B30"><circle cx="1523" cy="360" r="5"/><circle cx="1553" cy="390" r="4"/><circle cx="1533" cy="430" r="5"/></g>
-            <rect x="1530" y="510" width="16" height="12" fill="#5A341E"/>
-          </g>
-          <!-- ДОМИК 5 (правый край) -->
-          <g>
-            <rect x="1575" y="288" width="318" height="222" rx="4" fill="#8B5A2E" stroke="#5A341E" stroke-width="4"/>
-            <rect x="1605" y="328" width="68" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1615" y="338" width="48" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="1693" y="328" width="68" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1703" y="338" width="48" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="1781" y="328" width="68" height="70" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1791" y="338" width="48" height="50" rx="1" fill="url(#winGlow)"/>
-            <rect x="1605" y="414" width="68" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1615" y="424" width="48" height="44" rx="1" fill="url(#winGlow)"/>
-            <rect x="1693" y="414" width="68" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1703" y="424" width="48" height="44" rx="1" fill="url(#winGlow)"/>
-            <rect x="1781" y="414" width="68" height="64" rx="3" fill="#1A2F56" stroke="#FFD56B" stroke-width="3"/>
-            <rect x="1791" y="424" width="48" height="44" rx="1" fill="url(#winGlow)"/>
-            <!-- дверь не видно - венок как на картине справа -->
-            <circle cx="1734" cy="462" r="22" fill="none" stroke="#1B7A3A" stroke-width="7"/>
-            <g fill="#E53935"><rect x="1724" y="458" width="20" height="10" rx="2"/><polygon points="1724,458 1714,450 1724,450"/><polygon points="1744,458 1754,450 1744,450"/></g>
-            <path d="M1582 318 Q1630 348 1678 332 Q1728 316 1778 334 Q1822 350 1886 322" fill="none" stroke="#1B7A3A" stroke-width="7" stroke-linecap="round"/>
-            <g fill="#FFD54F"><circle cx="1602" cy="324" r="4"/><circle cx="1652" cy="340" r="5"/><circle cx="1702" cy="328" r="4"/><circle cx="1752" cy="340" r="5"/><circle cx="1802" cy="324" r="4"/></g>
-            <g fill="#E53935"><rect x="1724" y="328" width="18" height="10" rx="2"/><polygon points="1724,328 1714,320 1724,320"/><polygon points="1742,328 1752,320 1742,320"/></g>
-            <polygon points="1562,288 1734,148 1906,288" fill="white" stroke="#D6E8FF" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M1588 232 Q1734 286 1880 232 Q1820 258 1734 272 Q1648 258 1588 232 Z" fill="#E6F2FF" opacity="0.95"/>
-            <rect x="1812" y="168" width="28" height="72" rx="2" fill="#A06A33" stroke="#7A4A2E" stroke-width="2"/>
-            <rect x="1808" y="160" width="36" height="12" rx="2" fill="#7A4A2E"/>
-            <circle cx="1826" cy="142" r="6" fill="white" opacity="0.5"/><circle cx="1836" cy="118" r="4.5" fill="white" opacity="0.35"/>
-          </g>
-          <!-- боковые елки обрезанные как на картине -->
-          <g opacity="0.95">
-            <polygon points="-20,510 20,420 -40,420 0,350 -50,350 -10,280 30,280 65,350 0,350 35,420 -25,420 15,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-            <polygon points="1900,510 1940,420 1880,420 1920,350 1870,350 1910,280 1950,280 1985,350 1920,350 1955,420 1895,420 1935,510" fill="#0E6B2E" stroke="#0A4A1E" stroke-width="2"/>
-          </g>
-        </svg>
+            <div class="village">
+        <picture>
+          <source srcset="assets/village-bg.webp" type="image/webp">
+          <img src="assets/village-bg.jpg" alt="Зимняя деревня" width="1280" height="720" loading="eager" decoding="async" fetchpriority="high">
+        </picture>
       </div>
       <div class="snow-layer"></div>
       <div class="falling-snow" id="fallingSnow" aria-hidden="true"></div>
