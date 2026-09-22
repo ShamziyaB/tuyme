@@ -70,10 +70,31 @@
     .snow-layer, .falling-snow{ display:none; }
   }
   .counter{
-    position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px;
+    position:absolute; top:calc(58px + env(safe-area-inset-top,0px)); right:16px;
     font-size:13px; color:#4A5B8C; font-family:'Nunito';
     z-index:3;
   }
+  .mode-switch{
+    position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px;
+    z-index:4; display:flex; gap:4px;
+    background:rgba(11,27,58,0.85); border:1px solid rgba(255,255,255,0.14);
+    border-radius:999px; padding:4px; backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 4px 16px rgba(0,0,0,0.25);
+  }
+  .mode-btn{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:13px;
+    padding:7px 14px; border-radius:999px; border:none; cursor:pointer;
+    background:transparent; color:#B9C7EA;
+    transition:all .2s ease; display:flex; align-items:center; gap:6px;
+    -webkit-tap-highlight-color:transparent; line-height:1;
+  }
+  .mode-btn.active{
+    background:linear-gradient(135deg, #FFC93C, #FF8A3C);
+    color:#0B1B3A; box-shadow:0 2px 10px rgba(255,201,60,.40);
+  }
+  .mode-btn:active{ transform:scale(0.96); }
+  .mode-btn .mode-icon{ font-size:15px; }
   /* — Новогодняя деревня — */
   .winter-bg{
     position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
@@ -165,6 +186,10 @@
       <div id="soundHint" class="sound-hint">Дыбыс жоқ па? Дыбысты қосып, телефонның бүйіріндегі дыбыс қосқышын тексеріңіз</div>
       <div class="hint">Пернетақтаны түрт! ⌨️</div>
     </div>
+    <div class="mode-switch" id="modeSwitch" role="tablist" aria-label="Режим">
+      <button class="mode-btn active" data-mode="letters" type="button" role="tab" aria-selected="true"><span class="mode-icon">А</span> АБВ</button>
+      <button class="mode-btn" data-mode="emoji" type="button" role="tab" aria-selected="false"><span class="mode-icon">😊</span> Смайлы</button>
+    </div>
     <div class="counter" id="counter"></div>
   </div>
 
@@ -178,6 +203,32 @@
   const ALPHABET = "АӘБВГҒДЕЁЖЗИЙКҚЛМНҢОӨПРСТУҰҮФХҺЦЧШЩЪЫІЬЭЮЯ".split('');
   const EMOJI = ["🐱","🐶","🐻","🐸","🦊","🐵","🦁","🐨","🐼","⭐","🌈","🎈","🍎","🍓","🌸","🚀","🚗","⚽","🎵","☀️","💫","🦋","🐝","🐢","⛄","❄️","☃️","🎄","🎅","🤶","🎁","🎀","🧣","🧤","✨","🌟","🎉","🎊","🍪","🍬","🍭","🦌","🐧","🏠","🌨️","❤️","💖","🔔","🕯️","🌲","⛸️","🥳","🧸","🍊","🥨","🎂","🧁","🦄","🐰","🦝","🐹","🐳","🦋","🌙","☃️"];
   const COLORS = ["#FF6B5E","#FFC93C","#3FE0B0","#57B8FF","#FF6FB0","#9B7BFF"];
+
+  // режим АБВ / Смайлы
+  let mode = localStorage.getItem('tuyme_mode') || 'letters';
+
+  function applyMode(m){
+    mode = m;
+    localStorage.setItem('tuyme_mode', m);
+    document.querySelectorAll('.mode-btn').forEach(b=>{
+      const a = b.dataset.mode === m;
+      b.classList.toggle('active', a);
+      b.setAttribute('aria-selected', a);
+    });
+  }
+  // инициализация переключателя после загрузки DOM (script внизу - DOM уже есть)
+  (function initModeSwitch(){
+    applyMode(mode);
+    document.querySelectorAll('.mode-btn').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        applyMode(btn.dataset.mode);
+        playBlip();
+      });
+      btn.addEventListener('pointerdown', e=> e.stopPropagation());
+      btn.addEventListener('touchend', e=> { e.stopPropagation(); });
+    });
+  })();
 
   let taps = 0;
   let audioCtx = null;
@@ -270,7 +321,11 @@
   function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
   function spawn(x, y, forcedChar){
-    const useEmoji = !forcedChar && Math.random() < 0.35;
+    let useEmoji;
+    if (forcedChar) useEmoji = false;
+    else if (mode === 'emoji') useEmoji = true;
+    else if (mode === 'letters') useEmoji = false;
+    else useEmoji = Math.random() < 0.35;
     const el = document.createElement('div');
     el.className = 'pop';
     el.textContent = forcedChar ? forcedChar : (useEmoji ? pick(EMOJI) : pick(ALPHABET));
@@ -375,7 +430,7 @@
   }
 
   function handlePointer(e){
-    if (e.target.closest && e.target.closest('#unlockBtn')) return;
+    if (e.target.closest && (e.target.closest('#unlockBtn') || e.target.closest('#modeSwitch'))) return;
     const x = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? (e.changedTouches && e.changedTouches[0]?.clientX);
     const y = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? (e.changedTouches && e.changedTouches[0]?.clientY);
     if (x==null || y==null) return;
